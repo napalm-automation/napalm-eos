@@ -23,7 +23,6 @@ import re
 from napalm_base.base import NetworkDriver
 from pyeapi.eapilib import ConnectionError
 from napalm_base.exceptions import ConnectionException, CommandErrorException
-from netaddr import IPAddress
 from netaddr import IPNetwork
 from netaddr.core import AddrFormatError
 import time
