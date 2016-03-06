@@ -22,15 +22,15 @@ import pyeapi
 import re
 from napalm_base.base import NetworkDriver
 from pyeapi.eapilib import ConnectionError
-from napalm_base.exceptions import ConnectionException, MergeConfigException, ReplaceConfigException,\
-                                   SessionLockedException, CommandErrorException
+from napalm_base.exceptions import ConnectionException, CommandErrorException
 from netaddr import IPAddress
 from netaddr import IPNetwork
 from netaddr.core import AddrFormatError
-from datetime import datetime
 import time
 from napalm_base.utils import string_parsers
 from collections import defaultdict
+
+from . import configmgmt
 
 
 class EOSDriver(NetworkDriver):
@@ -75,91 +75,29 @@ class EOSDriver(NetworkDriver):
         """Implemantation of NAPALM method close."""
         self.discard_config()
 
-    def _load_config(self, filename=None, config=None, replace=True):
-        if self.config_session is not None:
-            raise SessionLockedException('Session is already in use by napalm')
-        else:
-            self.config_session = 'napalm_{}'.format(datetime.now().microsecond)
-
-        commands = list()
-        commands.append('configure session {}'.format(self.config_session))
-
-        if replace:
-            commands.append('rollback clean-config')
-
-        if filename is not None:
-            with open(filename, 'r') as f:
-                lines = f.readlines()
-        else:
-            if isinstance(config, list):
-                lines = config
-            else:
-                lines = config.splitlines()
-
-        for line in lines:
-            line = line.strip()
-            if line == '':
-                continue
-            if line.startswith('!'):
-                continue
-            commands.append(line)
-
-        try:
-            self.device.run_commands(commands)
-        except pyeapi.eapilib.CommandError as e:
-            self.discard_config()
-
-            if replace:
-                raise ReplaceConfigException(e.message)
-            else:
-                raise MergeConfigException(e.message)
-
     def load_replace_candidate(self, filename=None, config=None):
         """Implemantation of NAPALM method load_replace_candidate."""
-        self._load_config(filename, config, True)
+        configmgmt.load_config(self, filename, config, True)
 
     def load_merge_candidate(self, filename=None, config=None):
         """Implemantation of NAPALM method load_merge_candidate."""
-        self._load_config(filename, config, False)
+        configmgmt.load_config(self, filename, config, False)
 
     def compare_config(self):
         """Implemantation of NAPALM method compare_config."""
-        if self.config_session is None:
-            return ''
-        else:
-            commands = ['show session-config named %s diffs' % self.config_session]
-            result = self.device.run_commands(commands, encoding='text')[0]['output']
-
-            result = '\n'.join(result.splitlines()[2:])
-
-            return result.strip()
+        return configmgmt.compare_config(self)
 
     def commit_config(self):
         """Implemantation of NAPALM method commit_config."""
-        commands = list()
-        commands.append('copy startup-config flash:rollback-0')
-        commands.append('configure session {}'.format(self.config_session))
-        commands.append('commit')
-        commands.append('write memory')
-
-        self.device.run_commands(commands)
-        self.config_session = None
+        configmgmt.commit_config(self)
 
     def discard_config(self):
         """Implemantation of NAPALM method discard_config."""
-        if self.config_session is not None:
-            commands = list()
-            commands.append('configure session {}'.format(self.config_session))
-            commands.append('abort')
-            self.device.run_commands(commands)
-            self.config_session = None
+        configmgmt.discard_config(self)
 
     def rollback(self):
         """Implemantation of NAPALM method rollback."""
-        commands = list()
-        commands.append('configure replace flash:rollback-0')
-        commands.append('write memory')
-        self.device.run_commands(commands)
+        configmgmt.rollback(self)
 
     def get_facts(self):
         """Implemantation of NAPALM method get_facts."""
