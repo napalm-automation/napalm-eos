@@ -13,3 +13,7 @@
 # the License.
 
 """napalm_eos package."""
+
+def load_driver():
+    return EOSDriver
+
