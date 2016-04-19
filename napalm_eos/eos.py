@@ -555,8 +555,11 @@ class EOSDriver(NetworkDriver):
 
         return cli_output
 
+
     def get_bgp_config(self, group='', neighbor=''):
+
         """Implemantation of NAPALM method get_bgp_config."""
+
         _GROUP_FIELD_MAP_ = {
             'type': 'type',
             'multipath': 'multipath',
@@ -592,39 +595,39 @@ class EOSDriver(NetworkDriver):
         _PROPERTY_TYPE_MAP_ = {
             # used to determine the default value
             # and cast the values
-            'remote-as'             : int,
-            'ebgp-multihop'         : int,
-            'local-v4-addr'         : unicode,
-            'local-v6-addr'         : unicode,
-            'local-as'              : int,
-            'remove-private-as'     : bool,
-            'next-hop-self'         : bool,
-            'description'           : unicode,
+            'remote-as': int,
+            'ebgp-multihop': int,
+            'local-v4-addr': unicode,
+            'local-v6-addr': unicode,
+            'local-as': int,
+            'remove-private-as': bool,
+            'next-hop-self': bool,
+            'description': unicode,
             'route-reflector-client': bool,
-            'password'              : unicode,
-            'route-map'             : unicode,
-            'apply-groups'          : list,
-            'type'                  : unicode,
-            'import-policy'         : unicode,
-            'export-policy'         : unicode,
-            'multipath'             : bool
+            'password': unicode,
+            'route-map': unicode,
+            'apply-groups': list,
+            'type': unicode,
+            'import-policy': list,
+            'export-policy': list,
+            'multipath': bool
         }
 
         _DATATYPE_DEFAULT_ = {
-            unicode     : u'',
-            int         : 0,
-            bool        : False,
-            list        : []
+            unicode: u'',
+            int: 0,
+            bool: False,
+            list: []
         }
 
-        def parse_options(options, default_value = False):
+        def parse_options(options, default_value=False):
 
             if not options:
                 return dict()
 
             config_property = options[0]
-            field_name  = _PROPERTY_FIELD_MAP_.get(config_property)
-            field_type  = _PROPERTY_TYPE_MAP_.get(config_property)
+            field_name = _PROPERTY_FIELD_MAP_.get(config_property)
+            field_type = _PROPERTY_TYPE_MAP_.get(config_property)
             field_value = _DATATYPE_DEFAULT_.get(field_type) # to get the default value
 
             if not field_type:
@@ -654,8 +657,10 @@ class EOSDriver(NetworkDriver):
                         direction = options[1]
                     if direction == 'in':
                         field_name = 'import_policy'
+                        field_value = [field_value]
                     else:
                         field_name = 'export_policy'
+                        field_value = [field_value]
                     return {field_name: field_value}
 
             return dict()
@@ -664,7 +669,7 @@ class EOSDriver(NetworkDriver):
 
         commands = list()
         commands.append('show running-config | section router bgp')
-        bgp_conf = self.device.run_commands(commands, encoding = 'text')[0].get('output', '\n\n')
+        bgp_conf = self.device.run_commands(commands, encoding='text')[0].get('output', '\n\n')
         bgp_conf_lines = bgp_conf.splitlines()[2:]
 
         bgp_neighbors = dict()
@@ -729,7 +734,7 @@ class EOSDriver(NetworkDriver):
                     }) # populating with default values
                     bgp_neighbors[last_peer_group][peer_address].update({
                         'prefix_limit': {},
-                        'local_as'    : local_as,
+                        'local_as': local_as,
                         'authentication_key': u''
                     }) # few more default values
                 bgp_neighbors[last_peer_group][peer_address].update(
@@ -747,9 +752,9 @@ class EOSDriver(NetworkDriver):
                         key:_DATATYPE_DEFAULT_.get(_PROPERTY_TYPE_MAP_.get(prop)) for prop, key in _GROUP_FIELD_MAP_.iteritems()
                     })
                     bgp_config[group_name].update({
-                        'prefix_limit'   : {},
-                        'neighbors'      : {},
-                        'local_as'       : local_as
+                        'prefix_limit': {},
+                        'neighbors': {},
+                        'local_as': local_as
                     }) # few more default values
                 bgp_config[group_name].update(
                     parse_options(options, default_value)
@@ -764,6 +769,7 @@ class EOSDriver(NetworkDriver):
             bgp_config[group]['neighbors'] = peers
 
         return bgp_config
+
 
     def get_arp_table(self):
 
