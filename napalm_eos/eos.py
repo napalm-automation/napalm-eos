@@ -1212,3 +1212,162 @@ class EOSDriver(NetworkDriver):
                 previous_probe_ip_address = ip_address
 
         return traceroute_result
+
+    def get_bgp_neighbors_detail(self, neighbor_address=''):
+        """Function to return detailed BGP information.
+
+        Information returned by this function can be about a single peer or
+        about all peers. This can be controlled using the following:
+
+        :params neighbor_address: Retuns the statistics for a specific
+                                  BGP neighbor or for all BGP neighbors.
+        """
+
+        peer_ver = None
+        is_all = True if not neighbor_address else False
+
+        if is_all:
+            command = ['show ip bgp neighbors vrf all']
+        else:
+            peer_ver = IPAddress(neighbor_address).version
+            if peer_ver == 4:
+                command = ['show ip bgp neighbors %s vrf all' %
+                           neighbor_address]
+            else:
+                command = ['show ipv6 bgp neighbors %s vrf all' %
+                           neighbor_address]
+
+        raw_output = (
+            self.device.run_commands(command, encoding='text')[0]['output'])
+
+        bgp_detail_info = {}
+        int_fields = ['accepted_prefix_count', 'local_as', 'remote_as',
+                      'local_port', 'remote_port', 'local_port',
+                      'input_messages', 'output_messages', 'input_updates',
+                      'output_updates', 'messages_queued_out', 'holdtime',
+                      'configured_holdtime', 'keepalive',
+                      'configured_keepalive', 'advertise_prefix_count',
+                      'received_prefix_count']
+
+        # Parsing through the raw bgp output
+        if peer_ver == 6:
+            neighbor_match_string = (
+                r'BGP neighbor is (.*), remote AS (\d+),')
+        else:
+            neighbor_match_string = (
+                r'BGP neighbor is (\d+.\d+.\d+.\d+), remote AS (\d+),')
+
+        parsed_peers = re.findall(neighbor_match_string, raw_output)
+
+        # Adding remote ASN's as top level keys in dict
+        for item in parsed_peers:
+            if item[1] not in bgp_detail_info:
+                bgp_detail_info[int(item[1])] = []
+
+        if is_all:
+            # Issuing commands per peer
+            for item in parsed_peers:
+                if peer_ver == 6:
+                    command = ['show ipv6 bgp neighbors %s vrf all' % item[0]]
+                else:
+                    command = ['show ip bgp neighbors %s vrf all' % item[0]]
+                peer_output = (
+                    self.device.run_commands(
+                        command, encoding='text')[0]['output'])
+
+                # Using preset template to extract peer info
+                peer_info = (
+                    napalm_base.helpers.textfsm_extractor(
+                        self, 'bgp_detail', peer_output)[0])
+
+                # Issuing command to get number of accepted prefixes for peer
+                if peer_ver == 6:
+                    acc_prefix_command = (
+                        'show ipv6 bgp summary | include %s' % item[0])
+                else:
+                    acc_prefix_command = (
+                        'show ip bgp summary | include %s' % item[0])
+
+                accepted_prefix_output = (
+                    self.device.run_commands([acc_prefix_command],
+                                             encoding='text')[0]['output'])
+
+                accepted_prefix_count = accepted_prefix_output.split()[-1]
+
+                # Converting certain fields into int
+                for key in int_fields:
+                    try:
+                        peer_info[key] = int(peer_info[key])
+                    except Exception:
+                        # Defaulting the value to 0 in case of an exception
+                        peer_info[key] = 0
+
+                # Determining a few other fields in the final peer_info
+                peer_info['up'] = (
+                    True if peer_info['up'] == "up" else False)
+                peer_info['local_address_configured'] = (
+                    True if peer_info['local_address'] else False)
+                peer_info['multihop'] = (
+                    False if peer_info['multihop'] == 0 or
+                    peer_info['multihop'] == '' else True)
+
+                # TODO: The below fields need to be retrieved
+                # Currently defaulting their values to False or 0
+                peer_info['multipath'] = False
+                peer_info['remove_private_as'] = False
+                peer_info['suppress_4byte_as'] = False
+                peer_info['local_as_prepend'] = False
+                peer_info['flap_count'] = 0
+
+                # Appending peer_info to final data structure
+                bgp_detail_info[int(peer_info['remote_as'])].append(peer_info)
+
+        else:
+            # Using preset template to extract peer info
+            peer_info = (
+                napalm_base.helpers.textfsm_extractor(
+                    self, 'bgp_detail', raw_output)[0])
+
+            # Issuing command to get number of accepted prefixes for peer
+            if peer_ver == 6:
+                acc_prefix_command = (
+                    'show ipv6 bgp summary | include %s' % item[0])
+            else:
+                acc_prefix_command = (
+                    'show ip bgp summary | include %s' % item[0])
+
+            accepted_prefix_output = (
+                self.device.run_commands([acc_prefix_command],
+                                         encoding='text')[0]['output'])
+
+            accepted_prefix_count = accepted_prefix_output.split()[-1]
+
+            # Converting certain fields into int
+            for key in int_fields:
+                try:
+                    peer_info[key] = int(peer_info[key])
+                except Exception:
+                    # Defaulting the value to 0 in case of an exception
+                    peer_info[key] = 0
+
+            # Determining a few other fields in the final peer_info
+            peer_info['up'] = (
+                True if peer_info['up'] == "up" else False)
+            peer_info['local_address_configured'] = (
+                True if peer_info['local_address'] else False)
+            peer_info['multihop'] = (
+                False if peer_info['multihop'] == 0 or
+                peer_info['multihop'] == '' else True)
+
+            # TODO: The below fields need to be retrieved
+            # Currently defaulting their values to False or 0
+            peer_info['multipath'] = False
+            peer_info['remove_private_as'] = False
+            peer_info['suppress_4byte_as'] = False
+            peer_info['local_as_prepend'] = False
+            peer_info['flap_count'] = 0
+
+            # Appending peer_info to final data structure
+            bgp_detail_info[int(peer_info['remote_as'])].append(peer_info)
+
+        return bgp_detail_info
