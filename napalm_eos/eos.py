@@ -72,7 +72,8 @@ class EOSDriver(NetworkDriver):
                 port=self.port,
                 timeout=self.timeout
             )
-            self.device = pyeapi.client.Node(connection)
+            if self.device is None:
+                self.device = pyeapi.client.Node(connection)
             # does not raise an Exception if unusable
 
             # let's try to run a very simple command
