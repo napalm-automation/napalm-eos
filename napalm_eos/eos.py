@@ -1427,3 +1427,12 @@ class EOSDriver(NetworkDriver):
             optics_detail[port] = port_detail
 
         return optics_detail
+
+    def get_config(self):
+        """get_config implementation for EOS."""
+        result = self.device.run_commands(['show startup-config',
+                                           'show running-config'], encoding="text")
+        return {
+            'startup_config': result[0]['output'],
+            'running_config': result[1]['output'],
+        }
