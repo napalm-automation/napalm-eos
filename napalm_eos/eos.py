@@ -11,12 +11,12 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations under
 # the License.
-
 """
 Napalm driver for Arista EOS.
 
 Read napalm.readthedocs.org for more information.
 """
+from __future__ import unicode_literals
 
 # std libs
 import re
@@ -1094,7 +1094,6 @@ class EOSDriver(NetworkDriver):
         return snmp_information
 
     def get_users(self):
-
         def _sshkey_type(sshkey):
             if sshkey.startswith('ssh-rsa'):
                 return 'ssh_rsa', sshkey
@@ -1103,7 +1102,6 @@ class EOSDriver(NetworkDriver):
             return 'ssh_rsa', ''
 
         users = dict()
-
         commands = ['show user-account']
         user_items = self.device.run_commands(commands)[0].get('users', {})
 
@@ -1117,7 +1115,6 @@ class EOSDriver(NetworkDriver):
                 'sshkeys': [sshkey_value]
             })
             users[user] = user_details
-
         return users
 
     def traceroute(self, destination, source='', ttl=0, timeout=0):
