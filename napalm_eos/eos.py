@@ -40,6 +40,7 @@ from napalm_base.base import NetworkDriver
 from napalm_base.utils import string_parsers
 from napalm_base.exceptions import ConnectionException, MergeConfigException, \
                         ReplaceConfigException, SessionLockedException, CommandErrorException
+from napalm_base.utils import py23_compat
 
 # local modules
 # here add local imports
@@ -1430,6 +1431,7 @@ class EOSDriver(NetworkDriver):
         get_startup = retrieve == "all" or retrieve == "startup"
         get_running = retrieve == "all" or retrieve == "running"
         get_candidate = (retrieve == "all" or retrieve == "candidate") and self.config_session
+        tmp_dict = {}
 
         if retrieve == "all":
             commands = ['show startup-config',
@@ -1439,7 +1441,7 @@ class EOSDriver(NetworkDriver):
                 commands.append('show session-config named {}'.format(self.config_session))
 
             output = self.device.run_commands(commands, encoding="text")
-            return {
+            tmp_dict = {
                 'startup': output[0]['output'] if get_startup else "",
                 'running': output[1]['output'] if get_running else "",
                 'candidate': output[2]['output'] if get_candidate else "",
@@ -1447,7 +1449,7 @@ class EOSDriver(NetworkDriver):
         elif get_startup or get_running:
             commands = ['show {}-config'.format(retrieve)]
             output = self.device.run_commands(commands, encoding="text")
-            return {
+            tmp_dict = {
                 'startup': output[0]['output'] if get_startup else "",
                 'running': output[0]['output'] if get_running else "",
                 'candidate': "",
@@ -1455,20 +1457,26 @@ class EOSDriver(NetworkDriver):
         elif get_candidate:
             commands = ['show session-config named {}'.format(self.config_session)]
             output = self.device.run_commands(commands, encoding="text")
-            return {
+            tmp_dict = {
                 'startup': "",
                 'running': "",
                 'candidate': output[0]['output'],
             }
         elif retrieve == "candidate":
             # If we get here it means that we want the candidate but there is none.
-            return {
+            tmp_dict = {
                 'startup': "",
                 'running': "",
                 'candidate': "",
             }
         else:
             raise Exception("Wrong retrieve filter: {}".format(retrieve))
+
+        # Ensure proper data type is always being returned
+        return_dict = {}
+        for k, v in tmp_dict.items():
+            return_dict[k] = py23_compat.text_type(v)
+        return return_dict
 
     def ping(self, destination, source='', ttl=255, timeout=2, size=100, count=5):
         """
