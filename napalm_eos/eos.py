@@ -40,7 +40,6 @@ from napalm_base.base import NetworkDriver
 from napalm_base.utils import string_parsers
 from napalm_base.exceptions import ConnectionException, MergeConfigException, \
                         ReplaceConfigException, SessionLockedException, CommandErrorException
-from napalm_base.utils import py23_compat
 
 # local modules
 # here add local imports
@@ -1475,7 +1474,7 @@ class EOSDriver(NetworkDriver):
         # Ensure proper data type is always being returned
         return_dict = {}
         for k, v in tmp_dict.items():
-            return_dict[k] = py23_compat.text_type(v)
+            return_dict[k] = unicode(v)
         return return_dict
 
     def ping(self, destination, source='', ttl=255, timeout=2, size=100, count=5):
