@@ -316,7 +316,8 @@ class EOSDriver(NetworkDriver):
         return m.group('sent'), m.group('received')
 
     def get_bgp_neighbors(self):
-        NEIGHBOR_FILTER = 'bgp neighbors vrf all | include remote AS | remote router ID |^\s*IPv[46] Unicast:.*[0-9]+|^Local AS|Desc'  # noqa
+        NEIGHBOR_FILTER = ('bgp neighbors vrf all | include remote AS | remote router '
+                           'ID |^\s*IPv[46] Unicast:.*[0-9]+|^Local AS|Desc')
         output_summary_cmds = self.device.run_commands(
             ['show ipv6 bgp summary vrf all', 'show ip bgp summary vrf all'],
             encoding='json')
