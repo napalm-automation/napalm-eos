@@ -11,12 +11,12 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations under
 # the License.
-
 """
 Napalm driver for Arista EOS.
 
 Read napalm.readthedocs.org for more information.
 """
+from __future__ import unicode_literals
 
 # std libs
 import re
@@ -40,6 +40,7 @@ from napalm_base.base import NetworkDriver
 from napalm_base.utils import string_parsers
 from napalm_base.exceptions import ConnectionException, MergeConfigException, \
                         ReplaceConfigException, SessionLockedException, CommandErrorException
+from napalm_base.utils import py23_compat
 
 # local modules
 # here add local imports
@@ -331,7 +332,8 @@ class EOSDriver(NetworkDriver):
         return m.group('sent'), m.group('received')
 
     def get_bgp_neighbors(self):
-        NEIGHBOR_FILTER = 'bgp neighbors vrf all | include remote AS | remote router ID |^\s*IPv[46] Unicast:.*[0-9]+|^Local AS|Desc'  # noqa
+        NEIGHBOR_FILTER = ('bgp neighbors vrf all | include remote AS | remote router '
+                           'ID |^\s*IPv[46] Unicast:.*[0-9]+|^Local AS|Desc')
         output_summary_cmds = self.device.run_commands(
             ['show ipv6 bgp summary vrf all', 'show ip bgp summary vrf all'],
             encoding='json')
@@ -1106,7 +1108,6 @@ class EOSDriver(NetworkDriver):
         return snmp_information
 
     def get_users(self):
-
         def _sshkey_type(sshkey):
             if sshkey.startswith('ssh-rsa'):
                 return 'ssh_rsa', sshkey
@@ -1115,7 +1116,6 @@ class EOSDriver(NetworkDriver):
             return 'ssh_rsa', ''
 
         users = dict()
-
         commands = ['show user-account']
         user_items = self.device.run_commands(commands)[0].get('users', {})
 
@@ -1129,7 +1129,6 @@ class EOSDriver(NetworkDriver):
                 'sshkeys': [sshkey_value]
             })
             users[user] = user_details
-
         return users
 
     def traceroute(self, destination, source='', ttl=0, timeout=0):
@@ -1442,6 +1441,7 @@ class EOSDriver(NetworkDriver):
         get_startup = retrieve == "all" or retrieve == "startup"
         get_running = retrieve == "all" or retrieve == "running"
         get_candidate = (retrieve == "all" or retrieve == "candidate") and self.config_session
+        tmp_dict = {}
 
         if retrieve == "all":
             commands = ['show startup-config',
@@ -1451,7 +1451,7 @@ class EOSDriver(NetworkDriver):
                 commands.append('show session-config named {}'.format(self.config_session))
 
             output = self.device.run_commands(commands, encoding="text")
-            return {
+            tmp_dict = {
                 'startup': output[0]['output'] if get_startup else "",
                 'running': output[1]['output'] if get_running else "",
                 'candidate': output[2]['output'] if get_candidate else "",
@@ -1459,7 +1459,7 @@ class EOSDriver(NetworkDriver):
         elif get_startup or get_running:
             commands = ['show {}-config'.format(retrieve)]
             output = self.device.run_commands(commands, encoding="text")
-            return {
+            tmp_dict = {
                 'startup': output[0]['output'] if get_startup else "",
                 'running': output[0]['output'] if get_running else "",
                 'candidate': "",
@@ -1467,20 +1467,26 @@ class EOSDriver(NetworkDriver):
         elif get_candidate:
             commands = ['show session-config named {}'.format(self.config_session)]
             output = self.device.run_commands(commands, encoding="text")
-            return {
+            tmp_dict = {
                 'startup': "",
                 'running': "",
                 'candidate': output[0]['output'],
             }
         elif retrieve == "candidate":
             # If we get here it means that we want the candidate but there is none.
-            return {
+            tmp_dict = {
                 'startup': "",
                 'running': "",
                 'candidate': "",
             }
         else:
             raise Exception("Wrong retrieve filter: {}".format(retrieve))
+
+        # Ensure proper data type is always being returned
+        return_dict = {}
+        for k, v in tmp_dict.items():
+            return_dict[k] = py23_compat.text_type(v)
+        return return_dict
 
     def ping(self, destination, source='', ttl=255, timeout=2, size=100, count=5):
         """
