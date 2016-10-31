@@ -494,12 +494,13 @@ class EOSDriver(NetworkDriver):
                 }
 
         ''' Get CPU counters '''
-        m = re.search('(\d+.\d+)\%', cpu_output.splitlines()[2])
+        m = re.search('(\d+.\d+)(?:\%)?', cpu_output.splitlines()[2])
         environment_counters['cpu'][0] = {
             '%usage': float(m.group(1))
         }
-        m = re.search('(\d+)k\W+total\W+(\d+)k\W+used\W+(\d+)k\W+free', cpu_output.splitlines()[3])
 
+        ''' Get memory counters '''
+        m = re.search('(\d+)(?:k)?\W+total\W+(\d+)(?:k)?\W+used\W+(\d+)(?:k)?\W+free', cpu_output.splitlines()[3])
         environment_counters['memory'] = {
             'available_ram': int(m.group(1)),
             'used_ram': int(m.group(2))
