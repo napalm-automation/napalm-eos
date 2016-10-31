@@ -500,7 +500,10 @@ class EOSDriver(NetworkDriver):
         }
 
         ''' Get memory counters '''
-        m = re.search('(\d+)(?:k)?\W+total\W+(\d+)(?:k)?\W+used\W+(\d+)(?:k)?\W+free', cpu_output.splitlines()[3])
+        m = re.search(
+            '(\d+)(?:k)?\W+total\W+(\d+)(?:k)?\W+used\W+(\d+)(?:k)?\W+free',
+            cpu_output.splitlines()[3]
+        )
         environment_counters['memory'] = {
             'available_ram': int(m.group(1)),
             'used_ram': int(m.group(2))
