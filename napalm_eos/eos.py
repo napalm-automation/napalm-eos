@@ -23,7 +23,7 @@ import re
 import time
 
 from datetime import datetime
-
+from collections import defaultdict
 from netaddr import IPAddress
 from netaddr import IPNetwork
 
@@ -270,33 +270,26 @@ class EOSDriver(NetworkDriver):
         return lldp
 
     def get_interfaces_counters(self):
-        commands = list()
-
-        commands.append('show interfaces counters')
-        commands.append('show interfaces counters errors')
-
+        commands = ['show interfaces']
         output = self.device.run_commands(commands)
-
-        interface_counters = dict()
-
-        for interface, counters in output[0]['interfaces'].iteritems():
-            interface_counters[interface] = dict()
-
-            interface_counters[interface]['tx_octets'] = counters['outOctets']
-            interface_counters[interface]['rx_octets'] = counters['inOctets']
-            interface_counters[interface]['tx_unicast_packets'] = counters['outUcastPkts']
-            interface_counters[interface]['rx_unicast_packets'] = counters['inUcastPkts']
-            interface_counters[interface]['tx_multicast_packets'] = counters['outMulticastPkts']
-            interface_counters[interface]['rx_multicast_packets'] = counters['inMulticastPkts']
-            interface_counters[interface]['tx_broadcast_packets'] = counters['outBroadcastPkts']
-            interface_counters[interface]['rx_broadcast_packets'] = counters['inBroadcastPkts']
-            interface_counters[interface]['tx_discards'] = counters['outDiscards']
-            interface_counters[interface]['rx_discards'] = counters['inDiscards']
-
-            # Errors come from a different command
-            errors = output[1]['interfaceErrorCounters'][interface]
-            interface_counters[interface]['tx_errors'] = errors['outErrors']
-            interface_counters[interface]['rx_errors'] = errors['inErrors']
+        interface_counters = defaultdict(dict)
+        for interface, data in output[0]['interfaces'].iteritems():
+            if data['hardware'] == 'subinterface':
+                # Subinterfaces will never have counters so no point in parsing them at all
+                continue
+            counters = data.get('interfaceCounters', {})
+            interface_counters[interface]['tx_octets'] = counters.get('outOctets', -1)
+            interface_counters[interface]['rx_octets'] = counters.get('inOctets', -1)
+            interface_counters[interface]['tx_unicast_packets'] = counters.get('outUcastPkts', -1)
+            interface_counters[interface]['rx_unicast_packets'] = counters.get('inUcastPkts', -1)
+            interface_counters[interface]['tx_multicast_packets'] = counters.get('outMulticastPkts', -1)
+            interface_counters[interface]['rx_multicast_packets'] = counters.get('inMulticastPkts', -1)
+            interface_counters[interface]['tx_broadcast_packets'] = counters.get('outBroadcastPkts', -1)
+            interface_counters[interface]['rx_broadcast_packets'] = counters.get('inBroadcastPkts', -1)
+            interface_counters[interface]['tx_discards'] = counters.get('outDiscards', -1)
+            interface_counters[interface]['rx_discards'] = counters.get('inDiscards', -1)
+            interface_counters[interface]['tx_errors'] = counters.get('totalOutErrors', -1)
+            interface_counters[interface]['rx_errors'] = counters.get('totalInErrors', -1)
 
         return interface_counters
 
