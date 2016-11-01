@@ -278,19 +278,20 @@ class EOSDriver(NetworkDriver):
                 # Subinterfaces will never have counters so no point in parsing them at all
                 continue
             counters = data.get('interfaceCounters', {})
-            interface_counters[interface]['tx_octets'] = counters.get('outOctets', -1)
-            interface_counters[interface]['rx_octets'] = counters.get('inOctets', -1)
-            interface_counters[interface]['tx_unicast_packets'] = counters.get('outUcastPkts', -1)
-            interface_counters[interface]['rx_unicast_packets'] = counters.get('inUcastPkts', -1)
-            interface_counters[interface]['tx_multicast_packets'] = counters.get('outMulticastPkts', -1)
-            interface_counters[interface]['rx_multicast_packets'] = counters.get('inMulticastPkts', -1)
-            interface_counters[interface]['tx_broadcast_packets'] = counters.get('outBroadcastPkts', -1)
-            interface_counters[interface]['rx_broadcast_packets'] = counters.get('inBroadcastPkts', -1)
-            interface_counters[interface]['tx_discards'] = counters.get('outDiscards', -1)
-            interface_counters[interface]['rx_discards'] = counters.get('inDiscards', -1)
-            interface_counters[interface]['tx_errors'] = counters.get('totalOutErrors', -1)
-            interface_counters[interface]['rx_errors'] = counters.get('totalInErrors', -1)
-
+            interface_counters[interface].update(
+                tx_octets=counters.get('outOctets', -1),
+                rx_octets=counters.get('inOctets', -1),
+                tx_unicast_packets=counters.get('outUcastPkts', -1),
+                rx_unicast_packets=counters.get('inUcastPkts', -1),
+                tx_multicast_packets=counters.get('outMulticastPkts', -1),
+                rx_multicast_packets=counters.get('inMulticastPkts', -1),
+                tx_broadcast_packets=counters.get('outBroadcastPkts', -1),
+                rx_broadcast_packets=counters.get('inBroadcastPkts', -1),
+                tx_discards=counters.get('outDiscards', -1),
+                rx_discards=counters.get('inDiscards', -1),
+                tx_errors=counters.get('totalOutErrors', -1),
+                rx_errors=counters.get('totalInErrors', -1)
+            )
         return interface_counters
 
     @staticmethod
