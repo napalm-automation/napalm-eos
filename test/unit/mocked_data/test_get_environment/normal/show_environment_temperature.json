@@ -869,6 +869,33 @@
         }
     ],
     "shutdownOnOverheat": true,
-    "tempSensors": [],
+    "tempSensors": [
+       {
+            "maxTemperature": 48.21273929067406, 
+            "maxTemperatureLastChange": 1473779176.7382116, 
+            "hwStatus": "ok", 
+            "currentTemperature": 41.63677939132518, 
+            "description": "Cpu temp sensor", 
+            "overheatThreshold": 90.0, 
+            "criticalThreshold": 95.0, 
+            "inAlertState": false, 
+            "relPos": "1", 
+            "alertCount": 0, 
+            "name": "TempSensor1"
+        }, 
+        {
+            "maxTemperature": 38.0, 
+            "maxTemperatureLastChange": 1473853425.4411056, 
+            "hwStatus": "ok", 
+            "currentTemperature": 35.0, 
+            "description": "CPU board temp sensor", 
+            "overheatThreshold": 75.0, 
+            "criticalThreshold": 80.0, 
+            "inAlertState": false, 
+            "relPos": "2", 
+            "alertCount": 0, 
+            "name": "TempSensor2"
+        } 
+    ],
     "systemStatus": "temperatureOk"
 }
