@@ -1494,6 +1494,42 @@ class EOSDriver(NetworkDriver):
         else:
             raise Exception("Wrong retrieve filter: {}".format(retrieve))
 
+    def get_vrfs(self):
+        """get_vrf implementation for EOS."""
+
+        commands = ['show vrf']
+
+        # This command has no JSON yet
+        raw_output = self.device.run_commands(commands, encoding='text')[0].get('output', '')
+
+        output = napalm_base.helpers.textfsm_extractor(self, 'vrf', raw_output)
+        vrfs = dict()
+        all_vrf_interfaces = list()
+        for vrf in output:
+            if (vrf.get('route_descriptor', '') == "<not set>" or
+                vrf.get('route_descriptor', '') == 'None'):
+                vrf['route_descriptor'] = None
+            else:
+                vrf['route_descriptor'] = unicode(vrf['route_descriptor'])
+            interfaces = list()
+            for interface_raw in vrf.get('interfaces', []):
+                interface = interface_raw.split(',')
+                for line in interface:
+                    if line.strip() != '':
+                        interfaces.append(unicode(line.strip()))
+                        all_vrf_interfaces.append(unicode(line.strip()))
+            vrfs[unicode(vrf['name'])] = {
+                          'route_descriptor': vrf['route_descriptor'],
+                          'interfaces': interfaces,
+            }
+        all_interfaces = self.get_interfaces().keys()
+        vrfs[u"default"] = {
+                      'route_descriptor': None,
+                       'interfaces': list(set(all_interfaces) - set(all_vrf_interfaces)),
+        }
+
+        return vrfs
+
     def ping(self, destination, source='', ttl=255, timeout=2, size=100, count=5):
         """
         Execute ping on the device and returns a dictionary with the result.
