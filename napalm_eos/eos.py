@@ -1494,8 +1494,8 @@ class EOSDriver(NetworkDriver):
         else:
             raise Exception("Wrong retrieve filter: {}".format(retrieve))
 
-    def get_vrfs(self):
-        """get_vrf implementation for EOS."""
+    def get_network_instances(self, name=''):
+        """get_network_instances implementation for EOS."""
 
         commands = ['show vrf']
 
@@ -1504,31 +1504,50 @@ class EOSDriver(NetworkDriver):
 
         output = napalm_base.helpers.textfsm_extractor(self, 'vrf', raw_output)
         vrfs = dict()
-        all_vrf_interfaces = list()
+        all_vrf_interfaces = dict()
         for vrf in output:
             if (vrf.get('route_descriptor', '') == "<not set>" or
                 vrf.get('route_descriptor', '') == 'None'):
                 vrf['route_descriptor'] = None
             else:
                 vrf['route_descriptor'] = unicode(vrf['route_descriptor'])
-            interfaces = list()
+            interfaces = dict()
             for interface_raw in vrf.get('interfaces', []):
                 interface = interface_raw.split(',')
                 for line in interface:
                     if line.strip() != '':
-                        interfaces.append(unicode(line.strip()))
-                        all_vrf_interfaces.append(unicode(line.strip()))
+                        interfaces[unicode(line.strip())] = {}
+                        all_vrf_interfaces[unicode(line.strip())] = {}
+
             vrfs[unicode(vrf['name'])] = {
-                          'route_descriptor': vrf['route_descriptor'],
-                          'interfaces': interfaces,
+                          u'name': unicode(vrf['name']),
+                          u'type': u'L3VRF',
+                          u'state': {
+                              u'route_descriptor': vrf['route_descriptor'],
+                          },
+                          u'interfaces': {
+                              u'interface': interfaces,
+                          },
             }
         all_interfaces = self.get_interfaces().keys()
-        vrfs[u"default"] = {
-                      'route_descriptor': None,
-                       'interfaces': list(set(all_interfaces) - set(all_vrf_interfaces)),
+        vrfs[u'default'] = {
+            u'name': u'default',
+            u'type': u'L3VRF',
+            u'state': {
+                u'route_descriptor': None,
+            },
+            u'interfaces': {
+                u'interface': {k:{} for k in all_interfaces if k not in all_vrf_interfaces.keys() },
+            },
         }
 
-        return vrfs
+        if name != '':
+            if vrfs.get(name, '') != '':
+                return {unicode(name): vrfs[name]}
+            else:
+                return dict()
+        else:
+            return vrfs
 
     def ping(self, destination, source='', ttl=255, timeout=2, size=100, count=5):
         """
