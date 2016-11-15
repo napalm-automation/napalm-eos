@@ -229,7 +229,7 @@ class EOSDriver(NetworkDriver):
 
         interfaces = dict()
 
-        for interface, values in output['interfaces'].iteritems():
+        for interface, values in output['interfaces'].items():
             interfaces[interface] = dict()
 
             if values['lineProtocolStatus'] == 'up':
@@ -276,7 +276,7 @@ class EOSDriver(NetworkDriver):
         commands = ['show interfaces']
         output = self.device.run_commands(commands)
         interface_counters = defaultdict(dict)
-        for interface, data in output[0]['interfaces'].iteritems():
+        for interface, data in output[0]['interfaces'].items():
             if data['hardware'] == 'subinterface':
                 # Subinterfaces will never have counters so no point in parsing them at all
                 continue
@@ -365,13 +365,13 @@ class EOSDriver(NetworkDriver):
                 }
             }
             """
-            for vrf, vrf_data in summary['vrfs'].iteritems():
+            for vrf, vrf_data in summary['vrfs'].items():
                 if vrf not in bgp_counters.keys():
                     bgp_counters[vrf] = {
                         'peers': {}
                     }
                 bgp_counters[vrf]['router_id'] = vrf_data['routerId']
-                for peer, peer_data in vrf_data['peers'].iteritems():
+                for peer, peer_data in vrf_data['peers'].items():
                     peer_info = {
                         'is_up': peer_data['peerState'] == 'Established',
                         'is_enabled': peer_data['peerState'] == 'Established' or
@@ -477,7 +477,7 @@ class EOSDriver(NetworkDriver):
         # On board sensors
         parsed = {n: v for n, v in extract_temperature_data(temp_output['tempSensors'])}
         environment_counters['temperature'].update(parsed)
-        for psu, data in power_output['powerSupplies'].iteritems():
+        for psu, data in power_output['powerSupplies'].items():
             environment_counters['power'][psu] = {
                 'status': data['state'] == 'ok',
                 'capacity': data['capacity'],
@@ -748,7 +748,7 @@ class EOSDriver(NetworkDriver):
                     bgp_neighbors[last_peer_group][peer_address] = dict()
                     bgp_neighbors[last_peer_group][peer_address].update({
                         key: _DATATYPE_DEFAULT_.get(_PROPERTY_TYPE_MAP_.get(prop))
-                        for prop, key in _PEER_FIELD_MAP_.iteritems()
+                        for prop, key in _PEER_FIELD_MAP_.items()
                     })  # populating with default values
                     bgp_neighbors[last_peer_group][peer_address].update({
                         'prefix_limit': {},
@@ -768,7 +768,7 @@ class EOSDriver(NetworkDriver):
                     bgp_config[group_name] = dict()
                     bgp_config[group_name].update({
                         key: _DATATYPE_DEFAULT_.get(_PROPERTY_TYPE_MAP_.get(prop))
-                        for prop, key in _GROUP_FIELD_MAP_.iteritems()
+                        for prop, key in _GROUP_FIELD_MAP_.items()
                     })
                     bgp_config[group_name].update({
                         'prefix_limit': {},
@@ -782,7 +782,7 @@ class EOSDriver(NetworkDriver):
                 # for other kind of exception pass to next line
                 continue
 
-        for group, peers in bgp_neighbors.iteritems():
+        for group, peers in bgp_neighbors.items():
             if group not in bgp_config.keys():
                 continue
             bgp_config[group]['neighbors'] = peers
@@ -886,7 +886,7 @@ class EOSDriver(NetworkDriver):
             else:
                 raise
 
-        for interface_name, interface_details in interfaces_ipv4_out.iteritems():
+        for interface_name, interface_details in interfaces_ipv4_out.items():
             ipv4_list = list()
             if interface_name not in interfaces_ip.keys():
                 interfaces_ip[interface_name] = dict()
@@ -921,7 +921,7 @@ class EOSDriver(NetworkDriver):
                         u'prefix_length': ip.get('masklen')
                     }
 
-        for interface_name, interface_details in interfaces_ipv6_out.iteritems():
+        for interface_name, interface_details in interfaces_ipv6_out.items():
             ipv6_list = list()
             if interface_name not in interfaces_ip.keys():
                 interfaces_ip[interface_name] = dict()
@@ -1014,7 +1014,7 @@ class EOSDriver(NetworkDriver):
             # on a multi-VRF configured device need to go through a loop and get for each instance
             routes_out = command_output.get('vrfs', {}).get('default', {}).get('routes', {})
 
-        for prefix, route_details in routes_out.iteritems():
+        for prefix, route_details in routes_out.items():
             if prefix not in routes.keys():
                 routes[prefix] = list()
             route_protocol = route_details.get('routeType').upper()
@@ -1131,7 +1131,7 @@ class EOSDriver(NetworkDriver):
         commands = ['show user-account']
         user_items = self.device.run_commands(commands)[0].get('users', {})
 
-        for user, user_details in user_items.iteritems():
+        for user, user_details in user_items.items():
             user_details.pop('username', '')
             sshkey_value = user_details.pop('sshAuthorizedKey', '')
             sshkey_type, sshkey_value = _sshkey_type(sshkey_value)
@@ -1410,7 +1410,7 @@ class EOSDriver(NetworkDriver):
         # Formatting data into return data structure
         optics_detail = {}
 
-        for port, port_values in output.iteritems():
+        for port, port_values in output.items():
             port_detail = {}
 
             port_detail['physical_channels'] = {}
