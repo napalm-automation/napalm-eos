@@ -531,6 +531,8 @@ class EOSDriver(NetworkDriver):
                 if interface not in lldp_neighbors_out.keys():
                     lldp_neighbors_out[interface] = list()
                 capabilities = neighbor.get('systemCapabilities')
+                capabilities_list = list(capabilities.keys())
+                capabilities_list.sort()
                 lldp_neighbors_out[interface].append(
                     {
                         'parent_interface': interface,  # no parent interfaces
@@ -541,13 +543,12 @@ class EOSDriver(NetworkDriver):
                         'remote_system_description': neighbor.get('systemDescription', u''),
                         'remote_chassis_id': napalm_base.helpers.mac(
                             neighbor.get('chassisId', u'')),
-                        'remote_system_capab': py23_compat.text_type(', '.join(capabilities)),
+                        'remote_system_capab': py23_compat.text_type(', '.join(capabilities_list)),
                         'remote_system_enable_capab': py23_compat.text_type(', '.join(
-                            [capability for capability in capabilities.keys()
+                            [capability for capability in capabilities_list
                              if capabilities[capability]]))
                     }
                 )
-
         return lldp_neighbors_out
 
     def cli(self, commands=None):
