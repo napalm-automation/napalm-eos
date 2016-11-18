@@ -1543,11 +1543,10 @@ class EOSDriver(NetworkDriver):
             },
         }
 
-        if name != '':
-            if vrfs.get(name, '') != '':
+        if name:
+            if name in vrfs:
                 return {unicode(name): vrfs[name]}
-            else:
-                return dict()
+            return {}
         else:
             return vrfs
 
