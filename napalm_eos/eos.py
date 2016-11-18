@@ -1506,11 +1506,11 @@ class EOSDriver(NetworkDriver):
         vrfs = dict()
         all_vrf_interfaces = dict()
         for vrf in output:
-            if (vrf.get('route_descriptor', '') == "<not set>" or
-                    vrf.get('route_descriptor', '') == 'None'):
-                vrf['route_descriptor'] = None
+            if (vrf.get('route_distinguisher', '') == "<not set>" or
+                    vrf.get('route_distinguisher', '') == 'None'):
+                vrf['route_distinguisher'] = u''
             else:
-                vrf['route_descriptor'] = unicode(vrf['route_descriptor'])
+                vrf['route_distinguisher'] = unicode(vrf['route_distinguisher'])
             interfaces = dict()
             for interface_raw in vrf.get('interfaces', []):
                 interface = interface_raw.split(',')
@@ -1523,7 +1523,7 @@ class EOSDriver(NetworkDriver):
                           u'name': unicode(vrf['name']),
                           u'type': u'L3VRF',
                           u'state': {
-                              u'route_descriptor': vrf['route_descriptor'],
+                              u'route_distinguisher': vrf['route_distinguisher'],
                           },
                           u'interfaces': {
                               u'interface': interfaces,
@@ -1532,9 +1532,9 @@ class EOSDriver(NetworkDriver):
         all_interfaces = self.get_interfaces_ip().keys()
         vrfs[u'default'] = {
             u'name': u'default',
-            u'type': u'L3VRF',
+            u'type': u'DEFAULT_INSTANCE',
             u'state': {
-                u'route_descriptor': None,
+                u'route_distinguisher': u'',
             },
             u'interfaces': {
                 u'interface': {
