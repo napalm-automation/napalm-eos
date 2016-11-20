@@ -1512,17 +1512,17 @@ class EOSDriver(NetworkDriver):
                     vrf.get('route_distinguisher', '') == 'None'):
                 vrf['route_distinguisher'] = u''
             else:
-                vrf['route_distinguisher'] = unicode(vrf['route_distinguisher'])
+                vrf['route_distinguisher'] = py23_compat.text_type(vrf['route_distinguisher'])
             interfaces = dict()
             for interface_raw in vrf.get('interfaces', []):
                 interface = interface_raw.split(',')
                 for line in interface:
                     if line.strip() != '':
-                        interfaces[unicode(line.strip())] = {}
-                        all_vrf_interfaces[unicode(line.strip())] = {}
+                        interfaces[py23_compat.text_type(line.strip())] = {}
+                        all_vrf_interfaces[py23_compat.text_type(line.strip())] = {}
 
-            vrfs[unicode(vrf['name'])] = {
-                          u'name': unicode(vrf['name']),
+            vrfs[py23_compat.text_type(vrf['name'])] = {
+                          u'name': py23_compat.text_type(vrf['name']),
                           u'type': u'L3VRF',
                           u'state': {
                               u'route_distinguisher': vrf['route_distinguisher'],
@@ -1547,7 +1547,7 @@ class EOSDriver(NetworkDriver):
 
         if name:
             if name in vrfs:
-                return {unicode(name): vrfs[name]}
+                return {py23_compat.text_type(name): vrfs[name]}
             return {}
         else:
             return vrfs
