@@ -204,18 +204,26 @@ class EOSDriver(NetworkDriver):
         commands.append('write memory')
         self.device.run_commands(commands)
 
+    def _get_version(self):
+        """Helper used in `get_facts` and `get_environment`.
+        Returns the JSON output of `show version`."""
+        commands = [
+            'show version'
+        ]
+        result = self.device.run_commands(commands)
+        return result[0]
+
     def get_facts(self):
         """Implementation of NAPALM method get_facts."""
-        commands = list()
-        commands.append('show version')
+        commands = []
         commands.append('show hostname')
         commands.append('show interfaces')
 
         result = self.device.run_commands(commands)
 
-        version = result[0]
-        hostname = result[1]
-        interfaces_dict = result[2]['interfaces']
+        version = self._get_version()
+        hostname = result[0]
+        interfaces_dict = result[1]['interfaces']
 
         uptime = time.time() - version['bootupTimestamp']
 
@@ -436,12 +444,17 @@ class EOSDriver(NetworkDriver):
                 }
                 yield name, values
 
-        command = [
+        sys_version = self._get_version()
+        is_veos = sys_version['modelName'].lower() == 'veos'
+        commands = [
             'show environment cooling',
-            'show environment temperature',
-            'show environment power'
+            'show environment temperature'
         ]
-        fans_output, temp_output, power_output = self.device.run_commands(command)
+        if not is_veos:
+            commands.append('show environment power')
+            fans_output, temp_output, power_output = self.device.run_commands(commands)
+        else:
+            fans_output, temp_output = self.device.run_commands(commands)
         environment_counters = {
             'fans': {},
             'temperature': {},
@@ -460,12 +473,13 @@ class EOSDriver(NetworkDriver):
         # On board sensors
         parsed = {n: v for n, v in extract_temperature_data(temp_output['tempSensors'])}
         environment_counters['temperature'].update(parsed)
-        for psu, data in power_output['powerSupplies'].items():
-            environment_counters['power'][psu] = {
-                'status': data['state'] == 'ok',
-                'capacity': data['capacity'],
-                'output': data['outputPower']
-            }
+        if not is_veos:
+            for psu, data in power_output['powerSupplies'].items():
+                environment_counters['power'][psu] = {
+                    'status': data['state'] == 'ok',
+                    'capacity': data['capacity'],
+                    'output': data['outputPower']
+                }
         cpu_lines = cpu_output.splitlines()
         # Matches either of
         # Cpu(s):  5.2%us,  1.4%sy,  0.0%ni, 92.2%id,  0.6%wa,  0.3%hi,  0.4%si,  0.0%st ( 4.16 > )
