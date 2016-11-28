@@ -204,26 +204,18 @@ class EOSDriver(NetworkDriver):
         commands.append('write memory')
         self.device.run_commands(commands)
 
-    def _get_version(self):
-        """Helper used in `get_facts` and `get_environment`.
-        Returns the JSON output of `show version`."""
-        commands = [
-            'show version'
-        ]
-        result = self.device.run_commands(commands)
-        return result[0]
-
     def get_facts(self):
         """Implementation of NAPALM method get_facts."""
         commands = []
+        commands.append('show version')
         commands.append('show hostname')
         commands.append('show interfaces')
 
         result = self.device.run_commands(commands)
 
-        version = self._get_version()
-        hostname = result[0]
-        interfaces_dict = result[1]['interfaces']
+        version = result[0]
+        hostname = result[1]
+        interfaces_dict = result[2]['interfaces']
 
         uptime = time.time() - version['bootupTimestamp']
 
@@ -444,8 +436,8 @@ class EOSDriver(NetworkDriver):
                 }
                 yield name, values
 
-        sys_version = self._get_version()
-        is_veos = sys_version['modelName'].lower() == 'veos'
+        sh_version_out = self.device.run_commands(['show version'])
+        is_veos = sh_version_out[0]['modelName'].lower() == 'veos'
         commands = [
             'show environment cooling',
             'show environment temperature'
