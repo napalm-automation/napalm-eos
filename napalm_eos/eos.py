@@ -540,7 +540,7 @@ class EOSDriver(NetworkDriver):
                 )
         return lldp_neighbors_out
 
-    def cli(self, commands=None):
+    def cli(self, commands):
         cli_output = dict()
 
         if type(commands) is not list:
