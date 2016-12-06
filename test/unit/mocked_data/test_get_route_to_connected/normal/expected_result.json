@@ -1,0 +1,1 @@
+{"1.0.4.0/24": [{"protocol": "CONNECTED", "inactive_reason": "", "last_active": false, "age": 0, "routing_table": "default", "next_hop": "", "outgoing_interface": "Ethernet41", "preference": 0,  "current_active": false, "selected_next_hop": false, "protocol_attributes": {}}]}

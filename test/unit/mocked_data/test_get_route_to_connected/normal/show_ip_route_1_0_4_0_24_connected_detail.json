@@ -1,0 +1,25 @@
+{
+    "vrfs": {
+        "default": {
+            "routes": {
+                "1.0.4.0/24": {
+                    "kernelProgrammed": true,
+                    "directlyConnected": true,
+                    "routeAction": "forward",
+                    "vias": [
+                        {
+                            "interface": "Ethernet41",
+                            "interfaceDescription": "Description"
+                        }
+                    ],
+                    "hardwareProgrammed": true,
+                    "routeType": "connected"
+                }
+            },
+            "allRoutesProgrammedKernel": true,
+            "routingDisabled": false,
+            "allRoutesProgrammedHardware": true,
+            "defaultRouteState": "reachable"
+        }
+    }
+}
