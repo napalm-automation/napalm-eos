@@ -427,7 +427,7 @@ class EOSDriver(NetworkDriver):
     def get_environment(self):
         def extract_temperature_data(data):
             for s in data:
-                temp = s['currentTemperature'] if 'currentTemperature' in s else 'unknown'
+                temp = s['currentTemperature'] if 'currentTemperature' in s else 0.0
                 name = s['name']
                 values = {
                    'temperature': temp,
