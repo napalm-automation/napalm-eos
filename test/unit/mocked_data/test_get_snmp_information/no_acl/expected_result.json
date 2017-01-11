@@ -1,0 +1,11 @@
+{
+	"community": {
+		"public": {
+			"mode": "ro",
+			"acl": ""
+		}
+	},
+	"contact": "noc@cloudflare.com",
+	"location": "Marseille, France",
+	"chassis_id": "edge02.mrs01"
+}

@@ -10,5 +10,6 @@ Start
   ^snmp-server\scontact\s${Contact}
   ^snmp-server\schassis-id\s${Chassis_ID}
   ^snmp-server\scommunity\s${Community}\s((${Mode} ${ACL})|(group\s(.*))) -> Next.Record
+  ^snmp-server\scommunity\s${Community}\s${Mode} -> Next.Record
 
 EOF
