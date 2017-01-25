@@ -1,0 +1,133 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+.travis.yml	.travis.yml	1;"	F
+AddrFormatError	napalm_eos/eos.py	/^from netaddr.core import AddrFormatError$/;"	i
+BaseTestDouble	test/unit/conftest.py	/^from napalm_base.test.double import BaseTestDouble$/;"	i
+BaseTestGetters	test/unit/test_getters.py	/^from napalm_base.test.getters import BaseTestGetters$/;"	i
+CommandErrorException	napalm_eos/eos.py	/^                        ReplaceConfigException, SessionLockedException, CommandErrorException$/;"	i
+ConnectionError	napalm_eos/eos.py	/^from pyeapi.eapilib import ConnectionError$/;"	i
+ConnectionException	napalm_eos/eos.py	/^                        ReplaceConfigException, SessionLockedException, CommandErrorException$/;"	i
+EOSDriver	napalm_eos/__init__.py	/^from napalm_eos.eos import EOSDriver$/;"	i
+EOSDriver	napalm_eos/eos.py	/^class EOSDriver(NetworkDriver):$/;"	c
+EOSDriver	oc_test.py	/^from napalm_eos.eos import EOSDriver$/;"	i
+FakeEOSDevice	test/unit/conftest.py	/^class FakeEOSDevice(BaseTestDouble):$/;"	c
+IPAddress	napalm_eos/eos.py	/^from netaddr import IPAddress$/;"	i
+IPNetwork	napalm_eos/eos.py	/^from netaddr import IPNetwork$/;"	i
+MergeConfigException	napalm_eos/eos.py	/^                        ReplaceConfigException, SessionLockedException, CommandErrorException$/;"	i
+NetworkDriver	napalm_eos/eos.py	/^from napalm_base.base import NetworkDriver$/;"	i
+PatchedEOSDriver	test/unit/conftest.py	/^class PatchedEOSDriver(eos.EOSDriver):$/;"	c
+ReplaceConfigException	napalm_eos/eos.py	/^                        ReplaceConfigException, SessionLockedException, CommandErrorException$/;"	i
+SUPPORTED_OC_MODELS	napalm_eos/eos.py	/^    SUPPORTED_OC_MODELS = []$/;"	v	class:EOSDriver
+SessionLockedException	napalm_eos/eos.py	/^                        ReplaceConfigException, SessionLockedException, CommandErrorException$/;"	i
+TestConfigEOSDriver	test/unit/TestEOSDriver.py	/^class TestConfigEOSDriver(unittest.TestCase, TestConfigNetworkDriver):$/;"	c
+TestConfigNetworkDriver	test/unit/TestEOSDriver.py	/^from napalm_base.test.base import TestConfigNetworkDriver$/;"	i
+TestEOSDriver.py	test/unit/TestEOSDriver.py	1;"	F
+TestGetter	test/unit/test_getters.py	/^class TestGetter(BaseTestGetters):$/;"	c
+_RE_BGP_DESC	napalm_eos/eos.py	/^    _RE_BGP_DESC = re.compile('\\s+Description: (?P<description>.*?)')$/;"	v	class:EOSDriver
+_RE_BGP_INFO	napalm_eos/eos.py	/^    _RE_BGP_INFO = re.compile('BGP neighbor is (?P<neighbor>.*?), remote AS (?P<as>.*?), .*') # noqa$/;"	v	class:EOSDriver
+_RE_BGP_LOCAL	napalm_eos/eos.py	/^    _RE_BGP_LOCAL = re.compile('Local AS is (?P<as>.*?),.*')$/;"	v	class:EOSDriver
+_RE_BGP_PREFIX	napalm_eos/eos.py	/^    _RE_BGP_PREFIX = re.compile('(\\s*?)(?P<af>IPv[46]) Unicast:\\s*(?P<sent>\\d+)\\s*(?P<received>\\d+)') # noqa$/;"	v	class:EOSDriver
+_RE_BGP_RID_INFO	napalm_eos/eos.py	/^    _RE_BGP_RID_INFO = re.compile('.*BGP version 4, remote router ID (?P<rid>.*?), VRF (?P<vrf>.*?)$') # noqa$/;"	v	class:EOSDriver
+__all__	napalm_eos/__init__.py	/^__all__ = ('EOSDriver',)$/;"	v
+__author__	setup.py	/^__author__ = 'David Barroso <dbarrosop@dravetech.com>'$/;"	v
+__init__	napalm_eos/eos.py	/^    def __init__(self, hostname, username, password, timeout=60, optional_args=None):$/;"	m	class:EOSDriver
+__init__	test/unit/conftest.py	/^    def __init__(self, hostname, username, password, timeout=60, optional_args=None):$/;"	m	class:PatchedEOSDriver
+__init__.py	napalm_eos/__init__.py	1;"	F
+__init__.py	napalm_eos/utils/__init__.py	1;"	F
+__version__	napalm_eos/__init__.py	/^    __version__ = "Not installed"$/;"	v
+__version__	napalm_eos/__init__.py	/^    __version__ = pkg_resources.get_distribution('napalm-eos').version$/;"	v
+_append	napalm_eos/eos.py	/^        def _append(bgp_dict, peer_info):$/;"	f	function:EOSDriver.get_bgp_neighbors_detail
+_load_config	napalm_eos/eos.py	/^    def _load_config(self, filename=None, config=None, replace=True):$/;"	m	class:EOSDriver
+_oc_all_config	napalm_eos/eos.py	/^    def _oc_all_config(self):$/;"	m	class:EOSDriver
+_parse_per_peer_bgp_detail	napalm_eos/eos.py	/^        def _parse_per_peer_bgp_detail(peer_output):$/;"	f	function:EOSDriver.get_bgp_neighbors_detail
+_sshkey_type	napalm_eos/eos.py	/^        def _sshkey_type(sshkey):$/;"	f	function:EOSDriver.get_users
+author	setup.py	/^    author="David Barroso, Mircea Ulinic",$/;"	v
+author_email	setup.py	/^    author_email="dbarrosop@dravetech.com, mircea@cloudflare.com",$/;"	v
+c	napalm_eos/eos.py	/^import napalm_base.constants as c$/;"	i
+classifiers	setup.py	/^    classifiers=[$/;"	v
+cli	napalm_eos/eos.py	/^    def cli(self, commands):$/;"	m	class:EOSDriver
+close	napalm_eos/eos.py	/^    def close(self):$/;"	m	class:EOSDriver
+commit_config	napalm_eos/eos.py	/^    def commit_config(self):$/;"	m	class:EOSDriver
+compare_config	napalm_eos/eos.py	/^    def compare_config(self):$/;"	m	class:EOSDriver
+conftest.py	test/unit/conftest.py	1;"	F
+d	oc_test.py	/^d = EOSDriver(**eos_configuration)$/;"	v
+datetime	napalm_eos/eos.py	/^from datetime import datetime$/;"	i
+defaultdict	napalm_eos/eos.py	/^from collections import defaultdict$/;"	i
+description	setup.py	/^    description="Network Automation and Programmability Abstraction Layer with Multivendor support",$/;"	v
+discard_config	napalm_eos/eos.py	/^    def discard_config(self):$/;"	m	class:EOSDriver
+eos	test/unit/TestEOSDriver.py	/^from napalm_eos import eos$/;"	i
+eos	test/unit/conftest.py	/^from napalm_eos import eos$/;"	i
+eos.py	napalm_eos/eos.py	1;"	F
+eos_configuration	oc_test.py	/^eos_configuration = {$/;"	v
+extract_temperature_data	napalm_eos/eos.py	/^        def extract_temperature_data(data):$/;"	f	function:EOSDriver.get_environment
+fin	test/unit/conftest.py	/^    def fin():$/;"	f	function:set_device_parameters
+find_packages	setup.py	/^from setuptools import setup, find_packages$/;"	i
+get_arp_table	napalm_eos/eos.py	/^    def get_arp_table(self):$/;"	m	class:EOSDriver
+get_bgp_config	napalm_eos/eos.py	/^    def get_bgp_config(self, group='', neighbor=''):$/;"	m	class:EOSDriver
+get_bgp_neighbors	napalm_eos/eos.py	/^    def get_bgp_neighbors(self):$/;"	m	class:EOSDriver
+get_bgp_neighbors_detail	napalm_eos/eos.py	/^    def get_bgp_neighbors_detail(self, neighbor_address=''):$/;"	m	class:EOSDriver
+get_config	napalm_eos/eos.py	/^    def get_config(self, retrieve="all"):$/;"	m	class:EOSDriver
+get_environment	napalm_eos/eos.py	/^    def get_environment(self):$/;"	m	class:EOSDriver
+get_facts	napalm_eos/eos.py	/^    def get_facts(self):$/;"	m	class:EOSDriver
+get_interfaces	napalm_eos/eos.py	/^    def get_interfaces(self):$/;"	m	class:EOSDriver
+get_interfaces_counters	napalm_eos/eos.py	/^    def get_interfaces_counters(self):$/;"	m	class:EOSDriver
+get_interfaces_ip	napalm_eos/eos.py	/^    def get_interfaces_ip(self):$/;"	m	class:EOSDriver
+get_lldp_neighbors	napalm_eos/eos.py	/^    def get_lldp_neighbors(self):$/;"	m	class:EOSDriver
+get_lldp_neighbors_detail	napalm_eos/eos.py	/^    def get_lldp_neighbors_detail(self, interface=''):$/;"	m	class:EOSDriver
+get_mac_address_table	napalm_eos/eos.py	/^    def get_mac_address_table(self):$/;"	m	class:EOSDriver
+get_network_instances	napalm_eos/eos.py	/^    def get_network_instances(self, name=''):$/;"	m	class:EOSDriver
+get_ntp_servers	napalm_eos/eos.py	/^    def get_ntp_servers(self):$/;"	m	class:EOSDriver
+get_ntp_stats	napalm_eos/eos.py	/^    def get_ntp_stats(self):$/;"	m	class:EOSDriver
+get_optics	napalm_eos/eos.py	/^    def get_optics(self):$/;"	m	class:EOSDriver
+get_re_group	napalm_eos/eos.py	/^        def get_re_group(res, key, default=None):$/;"	f	function:EOSDriver.get_bgp_neighbors
+get_route_to	napalm_eos/eos.py	/^    def get_route_to(self, destination='', protocol=''):$/;"	m	class:EOSDriver
+get_snmp_information	napalm_eos/eos.py	/^    def get_snmp_information(self):$/;"	m	class:EOSDriver
+get_users	napalm_eos/eos.py	/^    def get_users(self):$/;"	m	class:EOSDriver
+helpers	napalm_eos/eos.py	/^import napalm_base.helpers$/;"	i
+include_package_data	setup.py	/^    include_package_data=True,$/;"	v
+install_reqs	setup.py	/^install_reqs = parse_requirements('requirements.txt', session=uuid.uuid1())$/;"	v
+install_requires	setup.py	/^    install_requires=reqs,$/;"	v
+is_alive	napalm_eos/eos.py	/^    def is_alive(self):$/;"	m	class:EOSDriver
+load_merge_candidate	napalm_eos/eos.py	/^    def load_merge_candidate(self, filename=None, config=None):$/;"	m	class:EOSDriver
+load_replace_candidate	napalm_eos/eos.py	/^    def load_replace_candidate(self, filename=None, config=None):$/;"	m	class:EOSDriver
+name	setup.py	/^    name="napalm-eos",$/;"	v
+napalm_base	napalm_eos/eos.py	/^import napalm_base.constants as c$/;"	i
+napalm_base	napalm_eos/eos.py	/^import napalm_base.helpers$/;"	i
+oc_test.py	oc_test.py	1;"	F
+open	napalm_eos/eos.py	/^    def open(self):$/;"	m	class:EOSDriver
+openconfig_mappings.yaml	napalm_eos/openconfig_mappings.yaml	1;"	F
+packages	setup.py	/^    packages=find_packages(),$/;"	v
+parent_conftest	test/unit/conftest.py	/^from napalm_base.test import conftest as parent_conftest$/;"	i
+parse_options	napalm_eos/eos.py	/^        def parse_options(options, default_value=False):$/;"	f	function:EOSDriver.get_bgp_config
+parse_requirements	setup.py	/^from pip.req import parse_requirements$/;"	i
+ping	napalm_eos/eos.py	/^    def ping(self, destination, source=c.PING_SOURCE, ttl=c.PING_TTL, timeout=c.PING_TIMEOUT,$/;"	m	class:EOSDriver
+pkg_resources	napalm_eos/__init__.py	/^import pkg_resources$/;"	i
+print_data	oc_test.py	/^def print_data(name, data, indentation=""):$/;"	f
+print_function	napalm_eos/eos.py	/^from __future__ import print_function$/;"	i
+py23_compat	napalm_eos/eos.py	/^from napalm_base.utils import py23_compat$/;"	i
+pyeapi	napalm_eos/eos.py	/^import pyeapi$/;"	i
+pytest	test/unit/conftest.py	/^import pytest$/;"	i
+pytest	test/unit/test_getters.py	/^import pytest$/;"	i
+pytest_generate_tests	test/unit/conftest.py	/^def pytest_generate_tests(metafunc):$/;"	f
+re	napalm_eos/eos.py	/^import re$/;"	i
+reqs	setup.py	/^reqs = [str(ir.req) for ir in install_reqs]$/;"	v
+rollback	napalm_eos/eos.py	/^    def rollback(self):$/;"	m	class:EOSDriver
+run_commands	test/unit/conftest.py	/^    def run_commands(self, command_list, encoding='json'):$/;"	m	class:FakeEOSDevice
+setUpClass	test/unit/TestEOSDriver.py	/^    def setUpClass(cls):$/;"	m	class:TestConfigEOSDriver
+set_device_parameters	test/unit/conftest.py	/^def set_device_parameters(request):$/;"	f
+setup	setup.py	/^from setuptools import setup, find_packages$/;"	i
+setup.py	setup.py	1;"	F
+string_parsers	napalm_eos/eos.py	/^from napalm_base.utils import string_parsers$/;"	i
+super	test/unit/conftest.py	/^from builtins import super$/;"	i
+test_getters.py	test/unit/test_getters.py	1;"	F
+time	napalm_eos/eos.py	/^import time$/;"	i
+traceroute	napalm_eos/eos.py	/^    def traceroute(self,$/;"	m	class:EOSDriver
+unicode_literals	napalm_eos/eos.py	/^from __future__ import unicode_literals$/;"	i
+unittest	test/unit/TestEOSDriver.py	/^import unittest$/;"	i
+url	setup.py	/^    url="https:\/\/github.com\/napalm-automation\/napalm-eos",$/;"	v
+uuid	setup.py	/^import uuid$/;"	i
+version	setup.py	/^    version="0.5.2",$/;"	v

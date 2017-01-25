@@ -1631,3 +1631,7 @@ class EOSDriver(NetworkDriver):
                     })
             ping_dict['success'].update({'results': results_array})
         return ping_dict
+
+    def _oc_all_config(self):
+        return self.device.run_commands(["show running-config all"],
+                                        encoding="text")[0]["output"]
