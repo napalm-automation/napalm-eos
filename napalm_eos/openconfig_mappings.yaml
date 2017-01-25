@@ -42,7 +42,8 @@ interfaces:
         subinterfaces:
             subinterface:
                 _block_capture: "(?P<block>interface (?P<key>Ethernet\\d+\\.\\d+)\n(?:.|\n)*?^!$)"
-                _parent: "interface (?P<parent>Ethernet\\d+)\\.\\d+"
+                _parent_key: "interface (?P<parent>Ethernet\\d+)\\.\\d+"
+                _path: "interfaces.interface.get_element('{}').subinterfaces.subinterface.get_element('{}')"
                 index:
                     _search: "napalm: not implemented"
                     _type: int
