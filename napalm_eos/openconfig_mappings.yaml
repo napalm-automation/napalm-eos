@@ -41,9 +41,7 @@ interfaces:
                 _default: 1500
         subinterfaces:
             subinterface:
-                _block_capture: "(?P<block>interface (?P<key>Ethernet\\d+\\.\\d+)\n(?:.|\n)*?^!$)"
-                _parent_key: "interface (?P<parent>Ethernet\\d+)\\.\\d+"
-                _path: "interfaces.interface.get_element('{}').subinterfaces.subinterface.get_element('{}')"
+                _block_capture: "(?P<block>interface (?P<key>{parent_key}\\.\\d+)\\n(?:.|\\n)*?^!$)"
                 index:
                     _search: "napalm: not implemented"
                     _type: int
