@@ -1,4 +1,10 @@
 ---
+_model: napalm_yang.oc_if.Interfaces()
+_execute:
+    config:
+        cli:
+            - show running-config all
+
 interfaces:
     interface:
         _block_capture: "(?P<block>interface (?P<key>(Ethernet|Management|Loopback|Port-Channel)\\d+)\n(?:.|\n)*?^!$)"
