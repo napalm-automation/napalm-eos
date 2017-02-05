@@ -1,0 +1,45 @@
+---
+interfaces:
+    interface:
+        _string: "interface {key}\n"
+        name:
+            _string: null
+        hold_time:
+            config:
+                down:
+                    _string: null
+                up:
+                    _string: null
+        config:
+            name:
+                _string: null
+            type_:
+                _string: null
+            enabled:
+                _map:
+                    "true":
+                        _string: "no shutdown\n"
+                    "false":
+                        _string: "shutdown\n"
+            description:
+                _string: "description {value}\n"
+            mtu:
+                _string: "mtu {value}\n"
+        subinterfaces:
+            subinterface:
+                _string: "interface {key}\n"
+                index:
+                    _string: null
+                config:
+                    index:
+                        _string: null
+                    name:
+                        _string: null
+                    enabled:
+                        _map:
+                            "true":
+                                _string: "no shutdown\n"
+                            "false":
+                                _string: "shutdown\n"
+                    description:
+                        _string: "description {value}\n"
