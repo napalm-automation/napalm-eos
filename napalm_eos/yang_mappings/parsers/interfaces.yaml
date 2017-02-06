@@ -34,7 +34,7 @@ interfaces:
                     Loopback: napalm_yang.ianaift.Softwareloopback
                     Port-Channel: napalm_yang.ianaift.Ieee8023Adlag
             enabled:
-                _search: "no shutdown"
+                _present: "no shutdown"
                 _type: boolean
                 _default: False
             description:
