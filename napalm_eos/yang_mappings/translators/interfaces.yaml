@@ -2,6 +2,7 @@
 interfaces:
     interface:
         _string: "interface {key}\n"
+        _remove: "no interface {key}\n"
         name:
             _string: null
         hold_time:
@@ -28,6 +29,7 @@ interfaces:
         subinterfaces:
             subinterface:
                 _string: "interface {key}\n"
+                _remove: "no interface {key}\n"
                 index:
                     _string: null
                 config:
