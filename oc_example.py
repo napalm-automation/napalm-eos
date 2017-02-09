@@ -22,11 +22,23 @@ eos_configuration = {
 junos = get_network_driver("junos")
 j = junos(**junos_configuration)
 j.open()
+
+# Let's parse the configuration
 j_running = j.parse_config("interfaces")
 
+# Print the exact model as defined by OC
+# This is mostly informative, as quick reference
 print(j_running.model_to_text())
+
+# We can get a representation of the data in text
 print(j_running.data_to_text())
 
+# Translate model
+new_config = j.translate_model(j_running, "interfaces")
+print(new_config)
+
+# Change a description and Translate model
+j_running.interfaces.interface["lo0"].config.description("asadqweqwe")
 new_config = j.translate_model(j_running, "interfaces")
 print(new_config)
 
@@ -92,8 +104,8 @@ print(e.compare_config())
 
 
 #  # Let's commit the configuration now
-#  e.commit_config()
+e.commit_config()
 
 #  # if now get a new running and candidate config, let's compare it with out previous candidate
-#  running = e.parse_config("interfaces")
-#  pprint.pprint(running.diff(candidate))
+running = e.parse_config("interfaces")
+pprint.pprint(running.diff(candidate))
