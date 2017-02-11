@@ -7,9 +7,9 @@ _execute:
 
 interfaces:
     interface:
-        _block_capture: "(?P<block>interface (?P<key>(Ethernet|Management|Loopback|Port-Channel)\\d+)\n(?:.|\n)*?^!$)"
+        _block_capture: "(?P<block>interface (?P<key>(Ethernet|Management|Loopback|Port-Channel|Vlan)\\d+)\n(?:.|\n)*?^!$)"
         name:
-            _search: "interface (?P<value>(Ethernet|Management|Loopback|Port-Channel).*)"
+            _search: "interface (?P<value>(Ethernet|Management|Loopback|Port-Channel|Vlan).*)"
             _type: py23_compat.text_type
         hold_time:
             config:
@@ -23,16 +23,17 @@ interfaces:
                     _default: 0
         config:
             name:
-                _search: "interface (?P<value>(Ethernet|Management|Loopback|Port-Channel).*)"
+                _search: "interface (?P<value>(Ethernet|Management|Loopback|Port-Channel|Vlan).*)"
                 _type: py23_compat.text_type
             type_:
-                _search: "interface (?P<value>(Ethernet|Management|Loopback|Port-Channel)).*"
+                _search: "interface (?P<value>(Ethernet|Management|Loopback|Port-Channel|Vlan)).*"
                 _type: mapping
                 _map:
                     Ethernet: napalm_yang.ianaift.Ethernetcsmacd
                     Management: napalm_yang.ianaift.Ethernetcsmacd
                     Loopback: napalm_yang.ianaift.Softwareloopback
                     Port-Channel: napalm_yang.ianaift.Ieee8023Adlag
+                    Vlan: napalm_yang.ianaift.L3Ipvlan
             enabled:
                 _present: "no shutdown"
                 _type: boolean
