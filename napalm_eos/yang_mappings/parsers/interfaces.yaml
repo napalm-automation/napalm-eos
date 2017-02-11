@@ -61,7 +61,7 @@ interfaces:
                         _search: "interface (?P<value>Ethernet.*)"
                         _type: py23_compat.text_type
                     enabled:
-                        _search: "no shutdown"
+                        _present: "no shutdown"
                         _type: boolean
                         _default: False
                     description:
