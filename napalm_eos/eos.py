@@ -920,7 +920,8 @@ class EOSDriver(NetworkDriver):
                             count += 1
                         else:
                             interfaces_ip[interface_name][u'ipv4'][ip.get('address')] = {
-                                u'prefix_length': ip.get('masklen')
+                                u'prefix_length': ip.get('masklen'),
+                                u'primary_ip': False
                             }
                             count += 1
 
