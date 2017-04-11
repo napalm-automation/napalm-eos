@@ -903,13 +903,26 @@ class EOSDriver(NetworkDriver):
                     }
                 )
 
-            for ip in ipv4_list:
-                if not ip.get('address'):
-                    continue
-                if ip.get('address') not in interfaces_ip.get(interface_name).get(u'ipv4'):
-                    interfaces_ip[interface_name][u'ipv4'][ip.get('address')] = {
-                        u'prefix_length': ip.get('masklen')
-                    }
+            len_ipv4 = len(ipv4_list)
+            count = 0
+
+            while (count != len_ipv4):
+                for ip in ipv4_list:
+                    if not ip.get('address'):
+                        count += 1
+                        continue
+                    if ip.get('address') not in interfaces_ip.get(interface_name).get(u'ipv4'):
+                        if (count == 0) and ('Loopback' not in interface_name):
+                            interfaces_ip[interface_name][u'ipv4'][ip.get('address')] = {
+                                u'prefix_length': ip.get('masklen'),
+                                u'primary_ip': True
+                            }
+                            count += 1
+                        else:
+                            interfaces_ip[interface_name][u'ipv4'][ip.get('address')] = {
+                                u'prefix_length': ip.get('masklen')
+                            }
+                            count += 1
 
         for interface_name, interface_details in interfaces_ipv6_out.items():
             ipv6_list = list()
