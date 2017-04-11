@@ -912,7 +912,7 @@ class EOSDriver(NetworkDriver):
                         count += 1
                         continue
                     if ip.get('address') not in interfaces_ip.get(interface_name).get(u'ipv4'):
-                        if (count == 0) and ('Loopback' not in interface_name):
+                        if count == 0:
                             interfaces_ip[interface_name][u'ipv4'][ip.get('address')] = {
                                 u'prefix_length': ip.get('masklen'),
                                 u'primary_ip': True
