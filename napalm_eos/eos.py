@@ -1679,8 +1679,16 @@ class EOSDriver(NetworkDriver):
                 fields = line.split()
                 if 'icmp' in line:
                     if 'Unreachable' in line:
-                        results_array.append({'ip_address': py23_compat.text_type(fields[1][:-1]),
-                                              'rtt': 0.0})
+                        if "(" in fields[2]:
+                            results_array.append(
+                                {
+                                    'ip_address': py23_compat.text_type(fields[2][1:-1]),
+                                    'rtt': 0.0,
+                                }
+                            )
+                        else:
+                            results_array.append({'ip_address': py23_compat.text_type(fields[1]),
+                                                  'rtt': 0.0})
                     elif 'truncated' in line:
                         if "(" in fields[4]:
                             results_array.append(
