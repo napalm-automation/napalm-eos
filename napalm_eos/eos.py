@@ -1682,8 +1682,20 @@ class EOSDriver(NetworkDriver):
                         results_array.append({'ip_address': py23_compat.text_type(fields[1][:-1]),
                                               'rtt': 0.0})
                     elif 'truncated' in line:
-                        results_array.append({'ip_address': py23_compat.text_type(fields[3][:-1]),
-                                             'rtt': 0.0})
+                        if "(" in fields[4]:
+                            results_array.append(
+                                {
+                                    'ip_address': py23_compat.text_type(fields[4][1:-2]),
+                                    'rtt': 0.0,
+                                }
+                            )
+                        else:
+                            results_array.append(
+                                {
+                                    'ip_address': py23_compat.text_type(fields[3][:-1]),
+                                    'rtt': 0.0,
+                                }
+                            )
                     elif fields[1] == 'bytes':
                         m = fields[6][5:]
                         results_array.append({'ip_address': py23_compat.text_type(fields[3][:-1]),
