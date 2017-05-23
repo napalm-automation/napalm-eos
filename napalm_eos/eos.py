@@ -789,11 +789,22 @@ class EOSDriver(NetworkDriver):
 
         return bgp_config
 
-    def get_arp_table(self):
+    def get_arp_table(self, ip=None, mac=None, interface=None):
 
         arp_table = []
 
-        commands = ['show arp']
+        command = 'show arp'
+
+        if ip:
+            command += ' {}'.format(ip)
+
+        if mac:
+            command += ' mac-address {}'.format(mac)
+
+        if interface:
+            command += ' interface {}'.format(interface)
+
+        commands = [command]
 
         ipv4_neighbors = []
         try:
@@ -958,11 +969,22 @@ class EOSDriver(NetworkDriver):
 
         return interfaces_ip
 
-    def get_mac_address_table(self):
+    def get_mac_address_table(self, mac=None, interface=None, vlan=None):
 
         mac_table = []
 
-        commands = ['show mac address-table']
+        command = 'show mac address-table'
+
+        if mac:
+            command += ' address {}'.format(mac)
+
+        if interface:
+            command += ' interface {}'.format(interface)
+
+        if vlan:
+            command += ' vlan {}'.format(vlan)
+
+        commands = [command]
 
         mac_entries = []
         try:
