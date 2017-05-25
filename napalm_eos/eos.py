@@ -1697,7 +1697,6 @@ class EOSDriver(NetworkDriver):
             ping_dict['success'].update({'results': results_array})
         return ping_dict
 
-
     def get_ipv6_neighbors(self):
 
         result = {}
