@@ -1708,13 +1708,13 @@ class EOSDriver(NetworkDriver):
 
         for neighbor in output['ipV6Neighbors']:
             if neighbor['address'] not in result:
-		result[neighbor['address']] = {}
-	        result[neighbor['address']]['neighbor_mac'] = neighbor['hwAddress']
-		result[neighbor['address']]['neighbor_state'] = neighbor['state']
-		result[neighbor['address']]['intf_connected'] = []
-		result[neighbor['address']]['intf_connected'].append(neighbor['interface'])
+                result[neighbor['address']] = {}
+                result[neighbor['address']]['neighbor_mac'] = neighbor['hwAddress']
+                result[neighbor['address']]['neighbor_state'] = neighbor['state']
+                result[neighbor['address']]['intf_connected'] = []
+                result[neighbor['address']]['intf_connected'].append(neighbor['interface'])
 
             else:
-		result[neighbor['address']]['intf_connected'].append(neighbor['interface'])
+                result[neighbor['address']]['intf_connected'].append(neighbor['interface'])
 
         return result
