@@ -1721,3 +1721,282 @@ class EOSDriver(NetworkDriver):
                     })
             ping_dict['success'].update({'results': results_array})
         return ping_dict
+
+    def _oc_platform(self):
+        "Private method to output oc_platform dictionary"
+
+        def add_sub(ret, comp, name):
+            ret['components']['component'][comp]['subcomponents']['subcomponent'].update({
+                name: {
+                    "name": name,
+                    "state": {
+                        "name": name,
+                    },
+                },
+            })
+
+        def get_channel_stats(transceiver):
+            eos_oc_map = {
+                "txPower": "output-power",
+                "rxPower": "input-power",
+                "txBias": "laser-bias-current",
+            }
+            ret = {}
+            for reading, oc_name in eos_oc_map.items():
+                if transceiver.get(reading, None) is not None:
+                    ret.update({oc_name: {"instant": transceiver[reading]}})
+            return ret
+
+        def search_temp_sensors(sensors, cls, pos):
+            for sensor in sensors:
+                if sensor['entPhysicalClass'] == cls and sensor['relPos'] == pos:
+                    return sensor['tempSensors']
+
+        def get_temp_sensor(sensor):
+            eos_oc_map = {
+                "overheatThreshold": "overheat-threshold",
+                "criticalThreshold": "critical-threshold",
+                "inAlertState": "alarm",
+            }
+            ret = {}
+            ret.update({
+                sensor['name']: {
+                    "name": sensor['name'],
+                    "state": {
+                        "name": sensor['name'],
+                        "type": "SENSOR",
+                        "description": sensor['description'],
+                        "temperature": {
+                            "instant": sensor['currentTemperature'],
+                            "max": sensor['maxTemperature'],
+                        },
+                    },
+                    "properties": {"property": {}},
+                },
+            })
+            for eos, oc in eos_oc_map.items():
+                ret[sensor['name']]['properties']['property'].update({
+                    oc: {
+                        "name": oc,
+                        "state": {
+                            "name": oc,
+                            "value": sensor[eos],
+                        },
+                    },
+                })
+            return ret
+
+        reals = ["ethernet"]
+        ret = {'components': {'component': {}}}
+
+        # There's probably a better way to do this with raw EEPROM data
+        eos_oc_pmd_map = {
+            "100GBASE-SR10": "ETH_100GBASE_SR10",
+            "40GBASE-UNIV": "ETH_40GBASE_LR4",
+            "10GBASE-SRL": "ETH_10GBASE_SR",
+            "10GBASE-SR": "ETH_10GBASE_SR",
+        }
+
+        result = self.device.run_commands([
+            "show inventory",
+            "show environment temperature",
+            "show interfaces",
+            "show interfaces transceiver",
+        ])
+        inv = result[0]
+        temp = result[1]
+        ints = result[2]["interfaces"]
+        trans = result[3]["interfaces"]
+
+        # All devices have systemInformation
+        plat_name = inv['systemInformation']['name']
+        ret['components']['component'].update({
+            plat_name: {
+                "name": plat_name,
+                "state": {
+                    "name": plat_name,
+                    "type": "CHASSIS",
+                    "description": inv['systemInformation']['description'],
+                    "mfg-name": "Arista Networks",
+                    "version": inv['systemInformation'],
+                    "serial-no": inv['systemInformation']['serialNum'],
+                    "part-no": plat_name,
+                },
+                "subcomponents": {"subcomponent": {}},
+            },
+        })
+        # Chassis temp sensors
+        for sensor in temp['tempSensors']:
+            ret['components']['component'].update(get_temp_sensor(sensor))
+            add_sub(ret, plat_name, sensor['name'])
+
+        # Hardware clock?
+        if inv.get('precisionClock', None) is not None:
+            ret['components']['component'].update({
+                "clock": {
+                    "name": "clock",
+                    "state": {
+                        "name": "clock",
+                        "type": "MODULE",
+                        "description": "Precision clock",
+                        "mfg-name": "Arista Networks",
+                    },
+                },
+            })
+            add_sub(ret, plat_name, "clock")
+
+        # Fans
+        for num, fan in inv['fanTraySlots'].items():
+            name = "fan_{}".format(str(num))
+            ret['components']['component'].update({
+                name: {
+                    "name": name,
+                    "state": {
+                        "name": name,
+                        "type": "FAN",
+                        "mfg-name": "Arista Networks",
+                        "part-no": fan['name'],
+                    },
+                },
+            })
+            add_sub(ret, plat_name, name)
+        # Power Supples
+        for num, ps in inv['powerSupplySlots'].items():
+            name = "powerSupply_{}".format(str(num))
+            ret['components']['component'].update({
+                name: {
+                    "name": name,
+                    "state": {
+                        "name": name,
+                        "type": "POWER_SUPPLY",
+                        "mfg-name": "Arista Networks",
+                        "serial-no": ps['serialNum'],
+                        "part-no": ps['name'],
+                    },
+                    "subcomponents": {"subcomponent": {}},
+                },
+            })
+            add_sub(ret, plat_name, name)
+            for sensor in temp['powerSupplySlots'][int(num) - 1]['tempSensors']:
+                ret['components']['component'].update(get_temp_sensor(sensor))
+                add_sub(ret, name, sensor['name'])
+        # cardSlots
+        has_cards = False
+        slot_map = {}
+        card_map = {
+            "hardwareRev": "version",
+            "serialNum": "serial-no",
+            "modelName": "part-no",
+        }
+        for card, details in inv.get("cardSlots", {}).items():
+            (card_class, num) = re.search("^[a-zA-Z]+)(\d+)", card).group(1, 2)
+            if not card.startswith("Fabric"):
+                slot_map.update({int(num): card})
+            has_cards = True
+            card_comp = {
+                "name": card,
+                "state": {
+                    "name": card,
+                    "type": "LINECARD",
+                    "mfg-name": "Arista Networks",
+                },
+                "subcomponents": {"subcomponent": {}},
+            }
+            for eos, oc in card_map.items():
+                if details.get(eos, None) is not None:
+                    card_comp['state'].update({oc: details[eos]})
+            ret['components']['component'][card] = card_comp
+            add_sub(ret, plat_name, card)
+            for sensor in search_temp_sensors(temp['cardSlots'], card_class, num):
+                ret['components']['component'].update(get_temp_sensor(sensor))
+                add_sub(ret, card, sensor['name'])
+
+        # xcvrs
+        xcvrs = {}
+        reals = ['ethernet']
+        for k, v in inv.get("xcvrSlots", {}).items():
+            if v.get("mfgName", "") != "Not Present":
+                xcvrs.update({k: v})
+                name = "xcvr_{}".format(k)
+                ret['components']['component'].update({
+                    name: {
+                        "name": name,
+                        "state": {
+                            "name": name,
+                            "type": "TRANSCEIVER",
+                            "part-no": v['modelName'],
+                            "serial-no": v['serialNum'],
+                            "mfg-name": v['mfgName'],
+                        },
+                    },
+                })
+
+        # interfaces
+        reals = ['ethernet']
+        for int_name, details in ints.items():
+            if details.get('hardware', '') not in reals:
+                continue
+            ret['components']['component'].update({
+                int_name: {
+                    "name": int_name,
+                    "state": {
+                        "name": int_name,
+                        "type": "PORT",
+                    },
+                },
+            })
+            if has_cards:
+                slot = slot_map[int(re.search('\d', int_name).group())]
+            else:
+                slot = plat_name
+            add_sub(ret, slot, int_name)
+
+            stripped = re.search("^[a-zA-Z]+(\d.*)$", int_name).group(1)
+            chan_count = 0
+            if stripped in xcvrs.keys() and not int_name.startswith("Ma"):
+                # Exact match, single-channel transeiver
+                trans_name = "xcvr_{}".format(stripped)
+                chan_count = 1
+            elif stripped.rsplit("/1", 1)[0] in xcvrs.keys() and not int_name.startswith("Ma"):
+                # Multi-channel transceiver
+                trans_name = "xcvr_{}".format(stripped.rsplit("/1", 1)[0])
+                chan_count = len([c for c in trans.keys()
+                                 if re.search(int_name.rsplit("1", 1)[0], c)])
+            else:
+                continue
+            ret['components']['component'][int_name]['subcomponents'] = {
+                'subcomponent': {
+                    trans_name: {
+                        "name": trans_name,
+                        "state": {
+                            "name": trans_name,
+                        },
+                    },
+                },
+            }
+            oc_trans = {
+                "state": {},
+                "physical-channels": {
+                    "channel": {},
+                },
+            }
+            oc_trans['state'].update({
+                "enabled": True if details['interfaceStatus'] != "disabled" else False})
+            if eos_oc_pmd_map.get(trans[int_name].get("mediaType", "none"), None) is not None:
+                oc_trans['state'].update({
+                    "ethernet-pmd": eos_oc_pmd_map[trans[int_name]['mediaType']]
+                })
+            for x in range(chan_count):
+                oc_trans['physical-channels']['channel'][x] = {'state': {}}
+                if x == 0:
+                    oc_trans['physical-channels']['channel'][x]['state'].update(
+                            get_channel_stats(trans[int_name]))
+                else:
+                    oc_trans['physical-channels']['channel'][x]['state'].update(
+                            get_channel_stats(trans["{}{}".format(
+                                int_name.rsplit("1", 1)[0], str(x+1))]))
+                oc_trans['physical-channels']['channel'][x]['state'].update({"index": x})
+            ret['components']['component'][trans_name].update({
+                "transceiver": oc_trans
+            })
+        return ret
