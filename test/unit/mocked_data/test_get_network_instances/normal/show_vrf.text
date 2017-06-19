@@ -7,7 +7,7 @@ Maximum number of vrfs allowed: 14
  NON     <not set>                 v4:incomplete,
                                    v6:incomplete
 
- TEST    0:1          ipv4,ipv6    v4:routing; multicast,   Ethernet1, Vlan100,
+ TEST    0:1          ipv4         v4:routing; multicast,   Ethernet1, Vlan100,
                                    v6:no routing            Vlan101, Vlan102,
                                                             Vlan103, Vlan104
  TEST2   1234:4321    ipv4,ipv6    v4:no routing,
