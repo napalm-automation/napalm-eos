@@ -1818,7 +1818,7 @@ class EOSDriver(NetworkDriver):
                     "type": "CHASSIS",
                     "description": inv['systemInformation']['description'],
                     "mfg-name": "Arista Networks",
-                    "version": inv['systemInformation'],
+                    "version": inv['systemInformation']['hardwareRev'],
                     "serial-no": inv['systemInformation']['serialNum'],
                     "part-no": plat_name,
                 },
