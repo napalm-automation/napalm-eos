@@ -1889,7 +1889,7 @@ class EOSDriver(NetworkDriver):
             "modelName": "part-no",
         }
         for card, details in inv.get("cardSlots", {}).items():
-            (card_class, num) = re.search("^[a-zA-Z]+)(\d+)", card).group(1, 2)
+            (card_class, num) = re.search("^([a-zA-Z]+)(\d+)", card).group(1, 2)
             if not card.startswith("Fabric"):
                 slot_map.update({int(num): card})
             has_cards = True
