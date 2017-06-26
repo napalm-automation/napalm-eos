@@ -76,7 +76,8 @@ class EOSDriver(NetworkDriver):
         if optional_args is None:
             optional_args = {}
 
-        self.transport = optional_args.get('eos_transport', 'https')
+        # eos_transport is there for backwards compatibility, transport is the preferred method
+        self.transport = optional_args.get('transport', optional_args.get('eos_transport', 'https'))
 
         if self.transport == 'https':
             self.port = optional_args.get('port', 443)
@@ -84,6 +85,8 @@ class EOSDriver(NetworkDriver):
             self.port = optional_args.get('port', 80)
 
         self.enablepwd = optional_args.get('enable_password', '')
+
+        self.profile = ["eos"]
 
     def open(self):
         """Implementation of NAPALM method open."""
@@ -1181,10 +1184,14 @@ class EOSDriver(NetworkDriver):
             user_details.pop('username', '')
             sshkey_value = user_details.pop('sshAuthorizedKey', '')
             sshkey_type, sshkey_value = _sshkey_type(sshkey_value)
+            if sshkey_value != '':
+                sshkey_list = [sshkey_value]
+            else:
+                sshkey_list = []
             user_details.update({
                 'level': user_details.pop('privLevel', 0),
                 'password': py23_compat.text_type(user_details.pop('secret', '')),
-                'sshkeys': [sshkey_value]
+                'sshkeys': sshkey_list
             })
             users[user] = user_details
 
@@ -1677,11 +1684,34 @@ class EOSDriver(NetworkDriver):
                 fields = line.split()
                 if 'icmp' in line:
                     if 'Unreachable' in line:
-                        results_array.append({'ip_address': py23_compat.text_type(fields[1]),
-                                              'rtt': 0.0})
+                        if "(" in fields[2]:
+                            results_array.append(
+                                {
+                                    'ip_address': py23_compat.text_type(fields[2][1:-1]),
+                                    'rtt': 0.0,
+                                }
+                            )
+                        else:
+                            results_array.append({'ip_address': py23_compat.text_type(fields[1]),
+                                                  'rtt': 0.0})
+                    elif 'truncated' in line:
+                        if "(" in fields[4]:
+                            results_array.append(
+                                {
+                                    'ip_address': py23_compat.text_type(fields[4][1:-2]),
+                                    'rtt': 0.0,
+                                }
+                            )
+                        else:
+                            results_array.append(
+                                {
+                                    'ip_address': py23_compat.text_type(fields[3][:-1]),
+                                    'rtt': 0.0,
+                                }
+                            )
                     elif fields[1] == 'bytes':
                         m = fields[6][5:]
-                        results_array.append({'ip_address': py23_compat.text_type(fields[3]),
+                        results_array.append({'ip_address': py23_compat.text_type(fields[3][:-1]),
                                               'rtt': float(m)})
                 elif 'packets transmitted' in line:
                     ping_dict['success']['probes_sent'] = int(fields[0])
