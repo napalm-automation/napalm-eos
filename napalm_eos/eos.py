@@ -76,6 +76,11 @@ class EOSDriver(NetworkDriver):
         if optional_args is None:
             optional_args = {}
 
+        self.recorder_options = {
+            "mode": optional_args.get("recorder_mode", "pass"),
+            "path": optional_args.get("recorder_path", ""),
+        }
+
         # eos_transport is there for backwards compatibility, transport is the preferred method
         self.transport = optional_args.get('transport', optional_args.get('eos_transport', 'https'))
 
@@ -106,7 +111,10 @@ class EOSDriver(NetworkDriver):
                 raise ConnectionException("Unknown transport: {}".format(self.transport))
 
             if self.device is None:
-                self.device = pyeapi.client.Node(connection, enablepwd=self.enablepwd)
+                self.device = napalm_base.recorder.Recorder(pyeapi.client.Node,
+                                                            recorder_options=self.recorder_options,
+                                                            connection=connection,
+                                                            enablepwd=self.enablepwd)
             # does not raise an Exception if unusable
 
             # let's try to run a very simple command
