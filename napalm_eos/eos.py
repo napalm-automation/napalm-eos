@@ -1723,3 +1723,25 @@ class EOSDriver(NetworkDriver):
                     })
             ping_dict['success'].update({'results': results_array})
         return ping_dict
+
+    def get_ipv6_neighbors(self):
+
+        result = {}
+        command = ['show ipv6 neighbors']
+
+        output = self.device.run_commands(command)[0]
+        if not output['ipV6Neighbors']:
+            return output['ipV6Neighbors']
+
+        for neighbor in output['ipV6Neighbors']:
+            if neighbor['address'] not in result:
+                result[neighbor['address']] = {}
+                result[neighbor['address']]['neighbor_mac'] = neighbor['hwAddress']
+                result[neighbor['address']]['neighbor_state'] = neighbor['state']
+                result[neighbor['address']]['intf_connected'] = []
+                result[neighbor['address']]['intf_connected'].append(neighbor['interface'])
+
+            else:
+                result[neighbor['address']]['intf_connected'].append(neighbor['interface'])
+
+        return result

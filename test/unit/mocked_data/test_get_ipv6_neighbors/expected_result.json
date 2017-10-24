@@ -1,0 +1,8 @@
+{
+  "fe80::a00:27ff:fe6a:1829":
+    {
+      "intf_connected": ["Et1", "Et2"],
+      "neighbor_mac": "0800.276a.1829",
+      "neighbor_state": "REACH"
+    }
+}

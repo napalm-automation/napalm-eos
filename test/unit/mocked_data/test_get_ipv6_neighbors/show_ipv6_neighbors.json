@@ -1,0 +1,20 @@
+{
+    "ipV6Neighbors": [
+        {
+            "hwAddress": "0800.276a.1829", 
+            "state": "REACH", 
+            "address": "fe80::a00:27ff:fe6a:1829", 
+            "interface": "Et1"
+        }, 
+        {
+            "hwAddress": "0800.276a.1829", 
+            "state": "REACH", 
+            "address": "fe80::a00:27ff:fe6a:1829", 
+            "interface": "Et2"
+        }
+    ], 
+    "dynamicEntries": 2, 
+    "notLearnedEntries": 0, 
+    "totalEntries": 2, 
+    "staticEntries": 0
+}
